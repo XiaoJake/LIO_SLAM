@@ -1,7 +1,7 @@
 /*
  * @Description: 数据预处理模块，包括时间同步、点云去畸变等
  * @Author: Zhang Jun
- * @Date: 2020-07-10 08:38:42
+ * @Date: 2020-07-17 10:38:42
  */
 #include "lio_slam/data_pretreat/data_pretreat_flow.hpp"
 
@@ -103,6 +103,7 @@ bool DataPretreatFlow::InitGNSS() {
     return gnss_inited;
 }
 
+//TODO 只保留对IMU、Lidar数据的判断
 bool DataPretreatFlow::HasData() {
     if (cloud_data_buff_.size() == 0)
         return false;
