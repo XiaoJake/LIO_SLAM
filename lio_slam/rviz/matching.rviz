@@ -253,7 +253,7 @@ Visualization Manager:
           Value: false
         vehicle_link:
           Value: true
-        velo_link:
+        laser_link:
           Value: false
         world:
           Value: false
