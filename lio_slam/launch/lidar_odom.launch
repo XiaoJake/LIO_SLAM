@@ -1,0 +1,29 @@
+<!--
+
+  <param name="robot_description"
+  textfile="$(find cartographer_ros)/urdf/backpack_2d.urdf" />
+ 
+  <node name="robot_state_publisher" pkg="robot_state_publisher"
+  type="robot_state_publisher" />
+
+
+-->
+
+
+<launch>
+
+    <!-- 当传感器数据源来自bag包时,设为true  真实机器人跑,用false  -->
+    <param name="/use_sim_time" value="true" />
+
+    <node pkg="rviz"  type="rviz"  name="rviz"  args="-d $(find lio_slam)/rviz/lidar_odom.rviz"></node>
+    <node pkg="lio_slam"  type="data_pretreat_node"  name="data_pretreat_node"  output="screen">
+        <remap from="/kitti/velo/pointcloud" to="/velodyne_points" />
+        <remap from="/kitti/oxts/imu" to="/imu/data" />
+    </node>
+
+    <node pkg="lio_slam"  type="front_end_node"  name="front_end_node"  output="screen"></node>
+
+    <!-- 局部地图 全局地图的发布与显示-->
+    <node pkg="lio_slam"  type="viewer_node"  name="viewer_node"  output="screen"></node>
+
+</launch>

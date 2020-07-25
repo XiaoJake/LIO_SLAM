@@ -125,6 +125,7 @@ bool Matching::Update(const CloudData& cloud_data, Eigen::Matrix4f& cloud_pose) 
     static Eigen::Matrix4f last_pose = init_pose_;
     static Eigen::Matrix4f predict_pose = init_pose_;
 
+    //TODO 原来是以gnss作为匹配的位姿预测值,我们需要以IMU估计的位姿来作预测值
     if (!has_inited_) {
         predict_pose = current_gnss_pose_;
     }

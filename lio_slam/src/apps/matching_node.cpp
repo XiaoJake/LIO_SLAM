@@ -1,5 +1,5 @@
 /*
- * @Description: 地图匹配定位的node文件
+ * @Description: 基于已知地图进行匹配定位的node文件
  * @Author: Zhang Jun
  * @Date: 2020-07-15 02:56:27
  */

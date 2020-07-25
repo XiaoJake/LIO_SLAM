@@ -52,8 +52,9 @@ bool IMUData::SyncData(std::deque<IMUData>& UnsyncedData, std::deque<IMUData>& S
     IMUData back_data = UnsyncedData.at(1);
     IMUData synced_data;
 
-    double front_scale = (back_data.time - sync_time) / (back_data.time - front_data.time);
-    double back_scale = (sync_time - front_data.time) / (back_data.time - front_data.time);
+    // 采用线性插值,以完成时间同步 y=[(x1-x)/(x1-x0)]*y0 + [(x-x0)/(x1-x0)]*y1
+    double front_scale = (back_data.time - sync_time) / (back_data.time - front_data.time);// [(x1-x)/(x1-x0)]
+    double back_scale = (sync_time - front_data.time) / (back_data.time - front_data.time);// [(x-x0)/(x1-x0)]
     synced_data.time = sync_time;
     synced_data.linear_acceleration.x = front_data.linear_acceleration.x * front_scale + back_data.linear_acceleration.x * back_scale;
     synced_data.linear_acceleration.y = front_data.linear_acceleration.y * front_scale + back_data.linear_acceleration.y * back_scale;

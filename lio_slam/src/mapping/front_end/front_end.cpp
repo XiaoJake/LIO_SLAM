@@ -101,7 +101,8 @@ bool FrontEnd::Update(const CloudData& cloud_data, Eigen::Matrix4f& cloud_pose) 
     registration_ptr_->ScanMatch(filtered_cloud_ptr, predict_pose, result_cloud_ptr, current_frame_.pose);
     cloud_pose = current_frame_.pose;
 
-    // 更新相邻两帧的相对运动
+    // 更新相邻两帧的相对运动。采用匀速运动模型进行位姿预测
+    // TODO 以imu估计姿态作为 位姿预测
     step_pose = last_pose.inverse() * current_frame_.pose;
     predict_pose = current_frame_.pose * step_pose;
     last_pose = current_frame_.pose;
