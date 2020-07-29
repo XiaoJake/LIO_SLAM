@@ -10,7 +10,7 @@
 namespace lio_slam {
 FrontEndFlow::FrontEndFlow(ros::NodeHandle& nh, std::string cloud_topic, std::string odom_topic) {
     cloud_sub_ptr_ = std::make_shared<CloudSubscriber>(nh, cloud_topic, 100000);
-    laser_odom_pub_ptr_ = std::make_shared<OdometryPublisher>(nh, odom_topic, "/map", "laser_link", 100);// /map /lidar
+    laser_odom_pub_ptr_ = std::make_shared<OdometryPublisher>(nh, odom_topic, "/map", "base_link", 100);// /map /lidar
 
     front_end_ptr_ = std::make_shared<FrontEnd>();
 }

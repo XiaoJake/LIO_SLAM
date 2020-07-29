@@ -15,7 +15,7 @@ ViewerFlow::ViewerFlow(ros::NodeHandle& nh, std::string cloud_topic) {
     transformed_odom_sub_ptr_ = std::make_shared<OdometrySubscriber>(nh, "/transformed_odom", 100000);
     optimized_key_frames_sub_ptr_ = std::make_shared<KeyFramesSubscriber>(nh, "/optimized_key_frames", 100000);
     // publisher
-    optimized_odom_pub_ptr_ = std::make_shared<OdometryPublisher>(nh, "/optimized_odom", "/map", "laser_link", 100);
+    optimized_odom_pub_ptr_ = std::make_shared<OdometryPublisher>(nh, "/optimized_odom", "/map", "base_link", 100);
     current_scan_pub_ptr_ = std::make_shared<CloudPublisher>(nh, "/current_scan", "/map", 100);
     global_map_pub_ptr_ = std::make_shared<CloudPublisher>(nh, "/global_map", "/map", 100);
     local_map_pub_ptr_ = std::make_shared<CloudPublisher>(nh, "/local_map", "/map", 100);
@@ -53,9 +53,15 @@ bool ViewerFlow::ReadData() {
 
 bool ViewerFlow::HasData() {
     if (cloud_data_buff_.size() == 0)
+    {
+        //LOG(ERROR) << "there is no data in cloud_data_buff" << std::endl;
         return false;
+    }
     if (transformed_odom_buff_.size() == 0)
+    {
+        //LOG(ERROR) << "there is no data in transformed_odom_buff_" << std::endl;
         return false;
+    }
 
     return true;
 }

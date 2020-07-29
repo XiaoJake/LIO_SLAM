@@ -11,35 +11,45 @@
 namespace lio_slam {
 DataPretreatFlow::DataPretreatFlow(ros::NodeHandle& nh, std::string cloud_topic) {
     // subscriber
-    cloud_sub_ptr_ = std::make_shared<CloudSubscriber>(nh, "/kitti/velo/pointcloud", 100000);
-    imu_sub_ptr_ = std::make_shared<IMUSubscriber>(nh, "/kitti/oxts/imu", 1000000);
+    cloud_sub_ptr_ = std::make_shared<CloudSubscriber>(nh, "/velodyne_points", 100000);//   /kitti/velo/pointcloud
+    imu_sub_ptr_ = std::make_shared<IMUSubscriber>(nh, "/imu/data", 1000000);// /kitti/oxts/imu
     lidar_to_imu_ptr_ = std::make_shared<TFListener>(nh, "/imu_link", "/laser_link");
-    // velocity_sub_ptr_ = std::make_shared<VelocitySubscriber>(nh, "/kitti/oxts/gps/vel", 1000000);
-    // gnss_sub_ptr_ = std::make_shared<GNSSSubscriber>(nh, "/kitti/oxts/gps/fix", 1000000);
+/*     velocity_sub_ptr_ = std::make_shared<VelocitySubscriber>(nh, "/kitti/oxts/gps/vel", 1000000);
+    gnss_sub_ptr_ = std::make_shared<GNSSSubscriber>(nh, "/kitti/oxts/gps/fix", 1000000); */
 
     // publisher
     cloud_pub_ptr_ = std::make_shared<CloudPublisher>(nh, cloud_topic, "/laser_link", 100);
-    //gnss_pub_ptr_ = std::make_shared<OdometryPublisher>(nh, "/synced_gnss", "/map", "/laser_link", 100);
+/*     gnss_pub_ptr_ = std::make_shared<OdometryPublisher>(nh, "/synced_gnss", "/map", "/laser_link", 100); */
 
-    distortion_adjust_ptr_ = std::make_shared<DistortionAdjust>();
+    /* distortion_adjust_ptr_ = std::make_shared<DistortionAdjust>(); */
 }
 
 bool DataPretreatFlow::Run() {
+    
+    // 完成数据读取、时间同步
     if (!ReadData())
+    {
+        std::cout << "Read data failed" << std::endl;
         return false;
-
+    }
+        
     if (!InitCalibration()) 
+    {
         return false;
+    }
 
-    // if (!InitGNSS())
-    //     return false;
+/*     if (!InitGNSS())
+        return false; */
 
     while(HasData()) {
         if (!ValidData())
             continue;
-
-        //TransformData();
-        PublishData();
+    
+/*     去除运动畸变
+        TransformData(); */
+    
+    // 发布预处理好的数据
+    PublishData();
     }
 
     return true;
@@ -53,38 +63,37 @@ bool DataPretreatFlow::ReadData() {
     cloud_sub_ptr_->ParseData(cloud_data_buff_);// 雷达数据为时间参考基准，不需要做插值
 
     static std::deque<IMUData> unsynced_imu_;
-    static std::deque<VelocityData> unsynced_velocity_;
-    static std::deque<GNSSData> unsynced_gnss_;
+/*     static std::deque<VelocityData> unsynced_velocity_;
+    static std::deque<GNSSData> unsynced_gnss_; */
 
     // 临时存储还未做时间同步的 IMU、速度、gnss数据
     imu_sub_ptr_->ParseData(unsynced_imu_);
-    // velocity_sub_ptr_->ParseData(unsynced_velocity_);
-    // gnss_sub_ptr_->ParseData(unsynced_gnss_);
+/*     velocity_sub_ptr_->ParseData(unsynced_velocity_);
+    gnss_sub_ptr_->ParseData(unsynced_gnss_); */
 
     if (cloud_data_buff_.size() == 0)
+    {
+        std::cout << "cloud data size error,now size is:" << cloud_data_buff_.size() << std::endl;
         return false;
+    }
+        
 
     // 对IMU、速度、gnss数据进行时间同步
     double cloud_time = cloud_data_buff_.front().time;
     bool valid_imu = IMUData::SyncData(unsynced_imu_, imu_data_buff_, cloud_time);
-    // bool valid_velocity = VelocityData::SyncData(unsynced_velocity_, velocity_data_buff_, cloud_time);
-    // bool valid_gnss = GNSSData::SyncData(unsynced_gnss_, gnss_data_buff_, cloud_time);
+/*     bool valid_velocity = VelocityData::SyncData(unsynced_velocity_, velocity_data_buff_, cloud_time);
+    bool valid_gnss = GNSSData::SyncData(unsynced_gnss_, gnss_data_buff_, cloud_time); */
 
     static bool sensor_inited = false;
-    // if (!sensor_inited) {
-    //     if (!valid_imu || !valid_velocity || !valid_gnss) {
-    //         cloud_data_buff_.pop_front();
-    //         return false;
-    //     }
-    //     sensor_inited = true;
-    // }
     if (!sensor_inited) {
-        if (!valid_imu) {
+        if (!valid_imu /* || !valid_velocity || !valid_gnss */) {
             cloud_data_buff_.pop_front();
             return false;
         }
         sensor_inited = true;
     }
+
+    //std::cout << "imudata synced succeed" << std::endl;
     return true;
 }
 
@@ -116,10 +125,10 @@ bool DataPretreatFlow::HasData() {
         return false;
     if (imu_data_buff_.size() == 0)
         return false;
-    // if (velocity_data_buff_.size() == 0)
-    //     return false;
-    // if (gnss_data_buff_.size() == 0)
-    //     return false;
+/*     if (velocity_data_buff_.size() == 0)
+        return false;
+    if (gnss_data_buff_.size() == 0)
+        return false; */
 
     return true;
 }
@@ -127,18 +136,14 @@ bool DataPretreatFlow::HasData() {
 bool DataPretreatFlow::ValidData() {
     current_cloud_data_ = cloud_data_buff_.front();
     current_imu_data_ = imu_data_buff_.front();
-    // current_velocity_data_ = velocity_data_buff_.front();
-    // current_gnss_data_ = gnss_data_buff_.front();
+/*     current_velocity_data_ = velocity_data_buff_.front();
+    current_gnss_data_ = gnss_data_buff_.front(); */
 
     double diff_imu_time = current_cloud_data_.time - current_imu_data_.time;
-    // double diff_velocity_time = current_cloud_data_.time - current_velocity_data_.time;
-    // double diff_gnss_time = current_cloud_data_.time - current_gnss_data_.time;
-    // if (diff_imu_time < -0.05 || diff_velocity_time < -0.05 || diff_gnss_time < -0.05) {
-    //     cloud_data_buff_.pop_front();
-    //     return false;
-    // }
+/*     double diff_velocity_time = current_cloud_data_.time - current_velocity_data_.time;
+    double diff_gnss_time = current_cloud_data_.time - current_gnss_data_.time; */
 
-    if (diff_imu_time < -0.05) {
+    if (diff_imu_time < -0.05 /* || diff_velocity_time < -0.05 || diff_gnss_time < -0.05 */) {
         cloud_data_buff_.pop_front();
         return false;
     }
@@ -148,20 +153,20 @@ bool DataPretreatFlow::ValidData() {
         return false;
     }
 
-    // if (diff_velocity_time > 0.05) {
-    //     velocity_data_buff_.pop_front();
-    //     return false;
-    // }
+/*     if (diff_velocity_time > 0.05) {
+        velocity_data_buff_.pop_front();
+        return false;
+    }
 
-    // if (diff_gnss_time > 0.05) {
-    //     gnss_data_buff_.pop_front();
-    //     return false;
-    // }
+    if (diff_gnss_time > 0.05) {
+        gnss_data_buff_.pop_front();
+        return false;
+    } */
 
     cloud_data_buff_.pop_front();
     imu_data_buff_.pop_front();
-    // velocity_data_buff_.pop_front();
-    // gnss_data_buff_.pop_front();
+/*     velocity_data_buff_.pop_front();
+    gnss_data_buff_.pop_front(); */
 
     return true;
 }
@@ -186,7 +191,7 @@ bool DataPretreatFlow::TransformData() {
 
 bool DataPretreatFlow::PublishData() {
     cloud_pub_ptr_->Publish(current_cloud_data_.cloud_ptr, current_cloud_data_.time);
-    //gnss_pub_ptr_->Publish(gnss_pose_, current_gnss_data_.time);
+/*     gnss_pub_ptr_->Publish(gnss_pose_, current_gnss_data_.time); */
 
     return true;
 }

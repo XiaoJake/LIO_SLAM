@@ -107,10 +107,11 @@ bool Viewer::UpdateWithNewKeyFrame(std::deque<KeyFrame>& new_key_frames,
 bool Viewer::OptimizeKeyFrames() {
     size_t optimized_index = 0;
     size_t all_index = 0;
+    // !!!else if 处原来是 < 符号，感觉不对，现在改为了 >
     while (optimized_index < optimized_key_frames_.size() && all_index < all_key_frames_.size()) {
         if (optimized_key_frames_.at(optimized_index).index < all_key_frames_.at(all_index).index) {
             optimized_index ++;
-        } else if (optimized_key_frames_.at(optimized_index).index < all_key_frames_.at(all_index).index) {
+        } else if (optimized_key_frames_.at(optimized_index).index > all_key_frames_.at(all_index).index) {
             all_index ++;
         } else {
             pose_to_optimize_ = optimized_key_frames_.at(optimized_index).pose * all_key_frames_.at(all_index).pose.inverse();
@@ -179,7 +180,7 @@ bool Viewer::SaveMap() {
     std::string filtered_map_file_path = map_path_ + "/filtered_map.pcd";
     pcl::io::savePCDFileBinary(filtered_map_file_path, *global_map_ptr);
 
-    LOG(INFO) << "地图保存完成，地址是：" << std::endl << map_path_ << std::endl << std::endl;
+    std::cout << std::endl << map_path_ << std::endl << std::endl;
 
     return true;
 }

@@ -24,6 +24,7 @@ class BackEnd {
     BackEnd();
 
     bool Update(const CloudData& cloud_data, const PoseData& laser_odom, const PoseData& gnss_pose);
+    bool Update(const CloudData& cloud_data, const PoseData& laser_odom);
     bool InsertLoopPose(const LoopPose& loop_pose);
     bool ForceOptimize();
 
@@ -42,7 +43,9 @@ class BackEnd {
     void ResetParam();
     bool SavePose(std::ofstream& ofs, const Eigen::Matrix4f& pose);
     bool AddNodeAndEdge(const PoseData& gnss_data);
+    bool AddNodeAndEdge();
     bool MaybeNewKeyFrame(const CloudData& cloud_data, const PoseData& laser_odom, const PoseData& gnss_pose);
+    bool MaybeNewKeyFrame(const CloudData& cloud_data, const PoseData& laser_odom);
     bool MaybeOptimized();
     bool SaveOptimizedPose();
 

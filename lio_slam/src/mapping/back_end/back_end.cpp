@@ -108,6 +108,21 @@ bool BackEnd::Update(const CloudData& cloud_data, const PoseData& laser_odom, co
     return true;
 }
 
+bool BackEnd::Update(const CloudData& cloud_data, const PoseData& laser_odom) {
+    ResetParam();
+
+    if (MaybeNewKeyFrame(cloud_data, laser_odom)) {
+        SavePose(laser_odom_ofs_, laser_odom.pose);
+        AddNodeAndEdge();
+        
+        if (MaybeOptimized()) {
+            SaveOptimizedPose();
+        }
+    }
+
+    return true;
+}
+
 bool BackEnd::InsertLoopPose(const LoopPose& loop_pose) {
     if (!graph_optimizer_config_.use_loop_close)
         return false;
@@ -179,6 +194,39 @@ bool BackEnd::MaybeNewKeyFrame(const CloudData& cloud_data, const PoseData& lase
     return has_new_key_frame_;
 }
 
+bool BackEnd::MaybeNewKeyFrame(const CloudData& cloud_data, const PoseData& laser_odom) {
+    static Eigen::Matrix4f last_key_pose = laser_odom.pose;
+    if (key_frames_deque_.size() == 0) {
+        has_new_key_frame_ = true;
+        last_key_pose = laser_odom.pose;
+    }
+
+    // 匹配之后根据距离判断是否需要生成新的关键帧，如果需要，则做相应更新
+    if (fabs(laser_odom.pose(0,3) - last_key_pose(0,3)) + 
+        fabs(laser_odom.pose(1,3) - last_key_pose(1,3)) +
+        fabs(laser_odom.pose(2,3) - last_key_pose(2,3)) > key_frame_distance_) {
+
+        has_new_key_frame_ = true;
+        last_key_pose = laser_odom.pose;
+    }
+
+    if (has_new_key_frame_) {
+        // 把关键帧点云存储到硬盘里
+        std::string file_path = key_frames_path_ + "/key_frame_" + std::to_string(key_frames_deque_.size()) + ".pcd";
+        pcl::io::savePCDFileBinary(file_path, *cloud_data.cloud_ptr);
+
+        KeyFrame key_frame;
+        key_frame.time = laser_odom.time;
+        key_frame.index = (unsigned int)key_frames_deque_.size();
+        key_frame.pose = laser_odom.pose;
+        key_frames_deque_.push_back(key_frame);
+        current_key_frame_ = key_frame;
+
+    }
+
+    return has_new_key_frame_;
+}
+
 bool BackEnd::AddNodeAndEdge(const PoseData& gnss_data) {
     Eigen::Isometry3d isometry;
     // 添加关键帧节点
@@ -207,6 +255,29 @@ bool BackEnd::AddNodeAndEdge(const PoseData& gnss_data) {
         graph_optimizer_ptr_->AddSe3PriorXYZEdge(node_num - 1, xyz, graph_optimizer_config_.gnss_noise);
         new_gnss_cnt_ ++;
     }
+
+    return true;
+}
+
+bool BackEnd::AddNodeAndEdge() {
+    Eigen::Isometry3d isometry;
+    // 添加关键帧节点
+    isometry.matrix() = current_key_frame_.pose.cast<double>();
+    if (!graph_optimizer_config_.use_gnss && graph_optimizer_ptr_->GetNodeNum() == 0)
+        graph_optimizer_ptr_->AddSe3Node(isometry, true);
+    else
+        graph_optimizer_ptr_->AddSe3Node(isometry, false);
+    new_key_frame_cnt_ ++;
+
+    // 添加激光里程计对应的边
+    static KeyFrame last_key_frame = current_key_frame_;
+    int node_num = graph_optimizer_ptr_->GetNodeNum();
+    if (node_num > 1) {
+        Eigen::Matrix4f relative_pose = last_key_frame.pose.inverse() * current_key_frame_.pose;
+        isometry.matrix() = relative_pose.cast<double>();
+        graph_optimizer_ptr_->AddSe3Edge(node_num-2, node_num-1, isometry, graph_optimizer_config_.odom_edge_noise);
+    }
+    last_key_frame = current_key_frame_;
 
     return true;
 }
