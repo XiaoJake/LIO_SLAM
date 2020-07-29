@@ -1,7 +1,7 @@
 /*
  * @Description: 订阅odometry数据
  * @Author: Zhang Jun
- * @Date: 2019-06-14 16:44:18
+ * @Date: 2020-07-14 16:44:18
  */
 #include "lio_slam/subscriber/odometry_subscriber.hpp"
 #include "glog/logging.h"
@@ -13,7 +13,7 @@ OdometrySubscriber::OdometrySubscriber(ros::NodeHandle& nh, std::string topic_na
 }
 
 void OdometrySubscriber::msg_callback(const nav_msgs::OdometryConstPtr& odom_msg_ptr) {
-    //buff_mutex_.lock();
+    buff_mutex_.lock();
     PoseData pose_data;
     pose_data.time = odom_msg_ptr->header.stamp.toSec();
 
@@ -30,15 +30,15 @@ void OdometrySubscriber::msg_callback(const nav_msgs::OdometryConstPtr& odom_msg
     pose_data.pose.block<3,3>(0,0) = q.matrix();
 
     new_pose_data_.push_back(pose_data);
-    //buff_mutex_.unlock();
+    buff_mutex_.unlock();
 }
 
 void OdometrySubscriber::ParseData(std::deque<PoseData>& pose_data_buff) {
-    //buff_mutex_.lock();
+    buff_mutex_.lock();
     if (new_pose_data_.size() > 0) {
         pose_data_buff.insert(pose_data_buff.end(), new_pose_data_.begin(), new_pose_data_.end());
         new_pose_data_.clear();
     }
-    //buff_mutex_.unlock();
+    buff_mutex_.unlock();
 }
 }

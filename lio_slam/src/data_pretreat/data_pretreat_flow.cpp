@@ -25,14 +25,14 @@ DataPretreatFlow::DataPretreatFlow(ros::NodeHandle& nh, std::string cloud_topic)
 }
 
 bool DataPretreatFlow::Run() {
-    
+
     // 完成数据读取、时间同步
     if (!ReadData())
     {
         std::cout << "Read data failed" << std::endl;
         return false;
     }
-        
+        std::cout << "Read data succeed" << std::endl;
     if (!InitCalibration()) 
     {
         return false;
@@ -73,7 +73,7 @@ bool DataPretreatFlow::ReadData() {
 
     if (cloud_data_buff_.size() == 0)
     {
-        std::cout << "cloud data size error,now size is:" << cloud_data_buff_.size() << std::endl;
+        //std::cout << "cloud data size error,now size is:" << cloud_data_buff_.size() << std::endl;
         return false;
     }
         
