@@ -149,15 +149,17 @@ bool Viewer::JointLocalMap(CloudData::CLOUD_PTR& local_map_ptr) {
 }
 
 bool Viewer::JointCloudMap(const std::deque<KeyFrame>& key_frames, CloudData::CLOUD_PTR& map_cloud_ptr) {
+    // 初始化:先清空全局地图指针
     map_cloud_ptr.reset(new CloudData::CLOUD());
 
     CloudData::CLOUD_PTR cloud_ptr(new CloudData::CLOUD());
     std::string file_path = "";
-
+    // 遍历所有关键帧，生成全局地图指针
     for (size_t i = 0; i < key_frames.size(); ++i) {
         file_path = key_frames_path_ + "/key_frame_" + std::to_string(key_frames.at(i).index) + ".pcd";
         pcl::io::loadPCDFile(file_path, *cloud_ptr);
         pcl::transformPointCloud(*cloud_ptr, *cloud_ptr, key_frames.at(i).pose);
+        // 全局地图添加
         *map_cloud_ptr += *cloud_ptr;
     }
     return true;
@@ -169,10 +171,10 @@ bool Viewer::SaveMap() {
     // 生成地图
     CloudData::CLOUD_PTR global_map_ptr(new CloudData::CLOUD());
     JointCloudMap(optimized_key_frames_, global_map_ptr);
-    // 保存原地图
+    // 往硬盘中保存原全局地图 pcd格式
     std::string map_file_path = map_path_ + "/map.pcd";
     pcl::io::savePCDFileBinary(map_file_path, *global_map_ptr);
-    // 保存滤波后地图
+    // 往硬盘中保存滤波后地图
     if (global_map_ptr->points.size() > 1000000) {
         std::shared_ptr<VoxelFilter> map_filter_ptr = std::make_shared<VoxelFilter>(0.5, 0.5, 0.5);
         map_filter_ptr->Filter(global_map_ptr, global_map_ptr);

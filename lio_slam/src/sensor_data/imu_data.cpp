@@ -21,7 +21,6 @@ bool IMUData::SyncData(std::deque<IMUData>& UnsyncedData, std::deque<IMUData>& S
     // 即找到与同步时间相邻的左右两个数据
     // 需要注意的是，如果左右相邻数据有一个离同步时间差值比较大，则说明数据有丢失，时间离得太远不适合做插值
     // 时间索引：把雷达采集时刻在其他传感器的时间线里找到对应的位置，然后找到该位置前后两帧的数据
-    bool flag_missing = false;
     while (UnsyncedData.size() >= 2) {
         // 如果第一个数据时间比雷达时间还要靠后，即插入时刻的前面没有数据，那么就无从插入，直接退出
         if (UnsyncedData.front().time > sync_time) 
@@ -34,18 +33,16 @@ bool IMUData::SyncData(std::deque<IMUData>& UnsyncedData, std::deque<IMUData>& S
         // 通过了前两个if判断，到这里说明雷达采集时刻已经处在前两个数据的中间。还需判断第一个数据时刻与雷达采集时刻时间差是否过大，若过大则中间肯定丢数据了，退出
         if (sync_time - UnsyncedData.front().time > 0.2) {
             UnsyncedData.pop_front();
-            flag_missing = true;
             break;
         }
         // 同样，如果第二个数据时刻与雷达采集时刻时间差过大，那么也是丢数据了，也退出。但这个数据不要删除,因为它在下一帧雷达采集时刻的前面。
         if (UnsyncedData.at(1).time - sync_time > 0.2) {
-            //UnsyncedData.pop_front();
-            flag_missing = true;
+            UnsyncedData.pop_front();
             break;
         }
         break;
     }
-    if (flag_missing == true)
+    if (UnsyncedData.size() < 2)
         return false;
 
     IMUData front_data = UnsyncedData.at(0);

@@ -88,16 +88,6 @@ bool ViewerFlow::ValidData() {
     return true;
 }
 
-bool ViewerFlow::PublishGlobalData() {
-    if (viewer_ptr_->HasNewGlobalMap() && global_map_pub_ptr_->HasSubscribers()) {
-        CloudData::CLOUD_PTR cloud_ptr(new CloudData::CLOUD());
-        viewer_ptr_->GetGlobalMap(cloud_ptr);
-        global_map_pub_ptr_->Publish(cloud_ptr);
-    }
-
-    return true;
-}
-
 bool ViewerFlow::PublishLocalData() {
     optimized_odom_pub_ptr_->Publish(viewer_ptr_->GetCurrentPose());
     current_scan_pub_ptr_->Publish(viewer_ptr_->GetCurrentScan());
@@ -106,6 +96,16 @@ bool ViewerFlow::PublishLocalData() {
         CloudData::CLOUD_PTR cloud_ptr(new CloudData::CLOUD());
         viewer_ptr_->GetLocalMap(cloud_ptr);
         local_map_pub_ptr_->Publish(cloud_ptr);
+    }
+
+    return true;
+}
+
+bool ViewerFlow::PublishGlobalData() {
+    if (viewer_ptr_->HasNewGlobalMap() && global_map_pub_ptr_->HasSubscribers()) {
+        CloudData::CLOUD_PTR cloud_ptr(new CloudData::CLOUD());
+        viewer_ptr_->GetGlobalMap(cloud_ptr);
+        global_map_pub_ptr_->Publish(cloud_ptr);
     }
 
     return true;

@@ -29,10 +29,10 @@ bool DataPretreatFlow::Run() {
     // 完成数据读取、时间同步
     if (!ReadData())
     {
-        std::cout << "Read data failed" << std::endl;
+        //std::cout << "Read data failed" << std::endl;
         return false;
     }
-        std::cout << "Read data succeed" << std::endl;
+        //std::cout << "Read data succeed" << std::endl;
     if (!InitCalibration()) 
     {
         return false;
@@ -56,7 +56,6 @@ bool DataPretreatFlow::Run() {
 }
 
 bool DataPretreatFlow::ReadData() {
-    
     // 时间同步
     // 关于插入时刻问题，因为我们是以雷达作为核心传感器，所以每收到一次雷达数据，就以当前雷达数据采集时刻
     // 作为要插入的时间点，从而获得除雷达以外的其他传感器的同一时刻等效信息。

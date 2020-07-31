@@ -68,22 +68,20 @@ bool BackEnd::InitGraphOptimizer(const YAML::Node& config_node) {
 }
 
 bool BackEnd::InitDataPath(const YAML::Node& config_node) {
+    // 1.获得data_path_转为string类型
     std::string data_path = config_node["data_path"].as<std::string>();
     if (data_path == "./") {
         data_path = WORK_SPACE_PATH;
     }
-
+    // 2.在工作空间里创建关键帧、odom轨迹数据的存储目录
     if (!FileManager::CreateDirectory(data_path + "/slam_data"))
         return false;
-
     key_frames_path_ = data_path + "/slam_data/key_frames";
     trajectory_path_ = data_path + "/slam_data/trajectory";
-
     if (!FileManager::InitDirectory(key_frames_path_, "关键帧点云"))
         return false;
     if (!FileManager::InitDirectory(trajectory_path_, "轨迹文件"))
         return false;
-
     if (!FileManager::CreateFile(ground_truth_ofs_, trajectory_path_ + "/ground_truth.txt"))
         return false;
     if (!FileManager::CreateFile(laser_odom_ofs_, trajectory_path_ + "/laser_odom.txt"))
@@ -285,8 +283,8 @@ bool BackEnd::AddNodeAndEdge() {
 bool BackEnd::MaybeOptimized() {
     bool need_optimize = false; 
 
-    if (new_gnss_cnt_ >= graph_optimizer_config_.optimize_step_with_gnss)
-        need_optimize = true;
+/*     if (new_gnss_cnt_ >= graph_optimizer_config_.optimize_step_with_gnss)
+        need_optimize = true; */
     if (new_loop_cnt_ >= graph_optimizer_config_.optimize_step_with_loop)
         need_optimize = true;
     if (new_key_frame_cnt_ >= graph_optimizer_config_.optimize_step_with_key_frame)
@@ -295,7 +293,7 @@ bool BackEnd::MaybeOptimized() {
     if (!need_optimize)
         return false;
 
-    new_gnss_cnt_ = 0;
+/*     new_gnss_cnt_ = 0; */
     new_loop_cnt_ = 0;
     new_key_frame_cnt_ = 0;
 

@@ -10,7 +10,7 @@ namespace lio_slam{
 IMUSubscriber::IMUSubscriber(ros::NodeHandle& nh, std::string topic_name, size_t buff_size)
     :nh_(nh) {
     subscriber_ = nh_.subscribe(topic_name, buff_size, &IMUSubscriber::msg_callback, this);
-    std::cout << "subscribe imu data from topic: " << topic_name << std::endl;
+    //std::cout << "subscribe imu data from topic: " << topic_name << std::endl;
 }
 
 void IMUSubscriber::msg_callback(const sensor_msgs::ImuConstPtr& imu_msg_ptr) {

@@ -12,14 +12,12 @@ namespace lio_slam {
 CloudSubscriber::CloudSubscriber(ros::NodeHandle& nh, std::string topic_name, size_t buff_size)
     :nh_(nh) {
     subscriber_ = nh_.subscribe(topic_name, buff_size, &CloudSubscriber::msg_callback, this);
-    std::cout << "subscribe cloud data from topic:" << topic_name << std::endl;
+    //std::cout << "subscribe cloud data from topic:" << topic_name << std::endl;
 }
 
 void CloudSubscriber::msg_callback(const sensor_msgs::PointCloud2::ConstPtr& cloud_msg_ptr) {
     //std::cout << "called CloudSubscriber::msg_callback" << std::endl;
     buff_mutex_.lock();
-    //std::cout << "started convert ros to pcl" << std::endl;
-
     CloudData cloud_data;
     cloud_data.time = cloud_msg_ptr->header.stamp.toSec();
     pcl::fromROSMsg(*cloud_msg_ptr, *(cloud_data.cloud_ptr));// 将ros中的点云数据转换为pcl的点云数据格式

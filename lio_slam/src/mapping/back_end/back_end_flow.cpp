@@ -116,6 +116,7 @@ bool BackEndFlow::ValidData() {
 bool BackEndFlow::UpdateBackEnd() {
 
     //TODO 目前没有gnss，如何去做这个里程计初始位姿的初始化
+    //主要是把odom轨迹先旋转一下，弄到和gnss轨迹初始对齐，再去优化
 /*     static bool odometry_inited = false;
     static Eigen::Matrix4f odom_init_pose = Eigen::Matrix4f::Identity();
 

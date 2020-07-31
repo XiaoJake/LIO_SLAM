@@ -24,7 +24,7 @@ int main(int argc, char *argv[]) {
 
     std::shared_ptr<DataPretreatFlow> data_pretreat_flow_ptr = std::make_shared<DataPretreatFlow>(nh, cloud_topic);
 
-    ros::Rate rate(100);
+    ros::Rate rate(40);
     while (ros::ok()) {
         ros::spinOnce();
 
