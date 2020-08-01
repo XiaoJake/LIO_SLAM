@@ -52,8 +52,9 @@ bool NDTRegistration::ScanMatch(const CloudData::CLOUD_PTR& input_source,
                                 const Eigen::Matrix4f& predict_pose, 
                                 CloudData::CLOUD_PTR& result_cloud_ptr,
                                 Eigen::Matrix4f& result_pose) {
-    ndt_ptr_->setInputSource(input_source);// 把要匹配的 源点云 保存一下
-    ndt_ptr_->align(*result_cloud_ptr, predict_pose);// 以 predict_pose 为初始值进行迭代优化，将结果保存在 final_transformation_ 中。内部最后还是调用的 computeTransformation 完成最终的计算
+ndt_ptr_->setInputSource(input_source);// 输入需要被匹配的 源点云 
+    ndt_ptr_->align(*result_cloud_ptr, predict_pose);// 计算需要的刚体变换以便将输入的源点云匹配到 目标点云
+                                                     // 以 predict_pose 为初始值进行迭代优化，将结果保存在 final_transformation_ 中。内部最后还是调用的 computeTransformation 完成最终的计算
     result_pose = ndt_ptr_->getFinalTransformation();
 
     return true;

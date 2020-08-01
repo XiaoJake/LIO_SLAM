@@ -1,7 +1,7 @@
 /*
  * @Description: 
  * @Author: Zhang Jun
- * @Date: 2019-07-17 18:25:13
+ * @Date: 2020-07-17 18:25:13
  */
 #ifndef LIO_SLAM_SENSOR_DATA_GNSS_DATA_HPP_
 #define LIO_SLAM_SENSOR_DATA_GNSS_DATA_HPP_

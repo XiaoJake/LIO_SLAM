@@ -89,6 +89,7 @@ bool BackEndFlow::ValidData() {
 /*     double diff_gnss_time = current_cloud_data_.time - current_gnss_pose_data_.time; */
     double diff_laser_time = current_cloud_data_.time - current_laser_odom_data_.time;
 
+    // 当前帧在雷达里程计0.05s之后,不要这个当前帧数据,弹出. 下一帧肯定更近,更合适
     if (/* diff_gnss_time < -0.05 || */ diff_laser_time < -0.05) {
         cloud_data_buff_.pop_front();
         return false;
@@ -99,11 +100,13 @@ bool BackEndFlow::ValidData() {
         return false;
     } */
 
+    // 当前帧超前当前雷达里程计0.05s,不要这个当前雷达里程计,弹出. 下一个雷达里程计肯定更近,更合适
     if (diff_laser_time > 0.05) {
         laser_odom_data_buff_.pop_front();
         return false;
     }
 
+    // 完成当前帧和里程计的转存后,要弹出  以便.front()能指向下一帧
     cloud_data_buff_.pop_front();
     laser_odom_data_buff_.pop_front();
 /*     gnss_pose_data_buff_.pop_front(); */
@@ -130,6 +133,7 @@ bool BackEndFlow::UpdateBackEnd() {
 }
 
 bool BackEndFlow::PublishData() {
+    
     transformed_odom_pub_ptr_->Publish(current_laser_odom_data_.pose, current_laser_odom_data_.time);
 
     if (back_end_ptr_->HasNewKeyFrame()) {

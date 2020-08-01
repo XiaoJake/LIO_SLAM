@@ -163,7 +163,7 @@ bool BackEnd::MaybeNewKeyFrame(const CloudData& cloud_data, const PoseData& lase
         last_key_pose = laser_odom.pose;
     }
 
-    // 匹配之后根据距离判断是否需要生成新的关键帧，如果需要，则做相应更新
+    // 匹配之后根据里程计之间的 曼哈顿距离 判断是否需要生成新的关键帧，如果需要，则做相应更新
     if (fabs(laser_odom.pose(0,3) - last_key_pose(0,3)) + 
         fabs(laser_odom.pose(1,3) - last_key_pose(1,3)) +
         fabs(laser_odom.pose(2,3) - last_key_pose(2,3)) > key_frame_distance_) {
@@ -181,7 +181,7 @@ bool BackEnd::MaybeNewKeyFrame(const CloudData& cloud_data, const PoseData& lase
         key_frame.time = laser_odom.time;
         key_frame.index = (unsigned int)key_frames_deque_.size();
         key_frame.pose = laser_odom.pose;
-        key_frames_deque_.push_back(key_frame);
+        key_frames_deque_.push_back(key_frame);// 存储位姿的关键帧
         current_key_frame_ = key_frame;
 
         current_key_gnss_.time = gnss_odom.time;
@@ -199,7 +199,7 @@ bool BackEnd::MaybeNewKeyFrame(const CloudData& cloud_data, const PoseData& lase
         last_key_pose = laser_odom.pose;
     }
 
-    // 匹配之后根据距离判断是否需要生成新的关键帧，如果需要，则做相应更新
+    // 匹配之后根据里程计之间的 曼哈顿距离 判断是否需要生成新的关键帧，如果需要，则做相应更新
     if (fabs(laser_odom.pose(0,3) - last_key_pose(0,3)) + 
         fabs(laser_odom.pose(1,3) - last_key_pose(1,3)) +
         fabs(laser_odom.pose(2,3) - last_key_pose(2,3)) > key_frame_distance_) {
@@ -217,7 +217,7 @@ bool BackEnd::MaybeNewKeyFrame(const CloudData& cloud_data, const PoseData& lase
         key_frame.time = laser_odom.time;
         key_frame.index = (unsigned int)key_frames_deque_.size();
         key_frame.pose = laser_odom.pose;
-        key_frames_deque_.push_back(key_frame);
+        key_frames_deque_.push_back(key_frame);// 存储位姿关键帧
         current_key_frame_ = key_frame;
 
     }
@@ -227,7 +227,7 @@ bool BackEnd::MaybeNewKeyFrame(const CloudData& cloud_data, const PoseData& lase
 
 bool BackEnd::AddNodeAndEdge(const PoseData& gnss_data) {
     Eigen::Isometry3d isometry;
-    // 添加关键帧节点
+    // 添加位姿关键帧节点
     isometry.matrix() = current_key_frame_.pose.cast<double>();
     if (!graph_optimizer_config_.use_gnss && graph_optimizer_ptr_->GetNodeNum() == 0)
         graph_optimizer_ptr_->AddSe3Node(isometry, true);
@@ -259,23 +259,23 @@ bool BackEnd::AddNodeAndEdge(const PoseData& gnss_data) {
 
 bool BackEnd::AddNodeAndEdge() {
     Eigen::Isometry3d isometry;
-    // 添加关键帧节点
-    isometry.matrix() = current_key_frame_.pose.cast<double>();
-    if (!graph_optimizer_config_.use_gnss && graph_optimizer_ptr_->GetNodeNum() == 0)
-        graph_optimizer_ptr_->AddSe3Node(isometry, true);
+    // 将 位姿关键帧 添加为节点
+    isometry.matrix() = current_key_frame_.pose.cast<double>();// isometry此时表示 当前节点的位姿
+    if (graph_optimizer_ptr_->GetNodeNum() == 0)
+        graph_optimizer_ptr_->AddSe3Node(isometry, true);// 目前节点数为0,说明这是第一个节点,第一个节点是需要 被固定的,true代表固定当前传入的节点
     else
         graph_optimizer_ptr_->AddSe3Node(isometry, false);
-    new_key_frame_cnt_ ++;
+    new_key_frame_cnt_ ++;// 记录已经添加的节点总数
 
     // 添加激光里程计对应的边
-    static KeyFrame last_key_frame = current_key_frame_;
+    static KeyFrame last_key_frame = current_key_frame_;// 这是静态变量,只初始化一次,下次到这里会直接跳过,不会再以 current_key_frame_ 赋值
     int node_num = graph_optimizer_ptr_->GetNodeNum();
     if (node_num > 1) {
         Eigen::Matrix4f relative_pose = last_key_frame.pose.inverse() * current_key_frame_.pose;
-        isometry.matrix() = relative_pose.cast<double>();
+        isometry.matrix() = relative_pose.cast<double>();// isometry再次被赋值,此时表示 相邻两节点之间的位姿差
         graph_optimizer_ptr_->AddSe3Edge(node_num-2, node_num-1, isometry, graph_optimizer_config_.odom_edge_noise);
     }
-    last_key_frame = current_key_frame_;
+    last_key_frame = current_key_frame_;// 当前位姿关键帧,即当前节点完成添加节点和添加边之后,就被当做相对于下一个节点的 上一个节点
 
     return true;
 }
@@ -285,8 +285,9 @@ bool BackEnd::MaybeOptimized() {
 
 /*     if (new_gnss_cnt_ >= graph_optimizer_config_.optimize_step_with_gnss)
         need_optimize = true; */
-    if (new_loop_cnt_ >= graph_optimizer_config_.optimize_step_with_loop)
-        need_optimize = true;
+/*     if (new_loop_cnt_ >= graph_optimizer_config_.optimize_step_with_loop)
+        need_optimize = true; */
+    // 以关键帧阈值数量来判断是否需要进行优化
     if (new_key_frame_cnt_ >= graph_optimizer_config_.optimize_step_with_key_frame)
         need_optimize = true;
 
@@ -294,11 +295,11 @@ bool BackEnd::MaybeOptimized() {
         return false;
 
 /*     new_gnss_cnt_ = 0; */
-    new_loop_cnt_ = 0;
-    new_key_frame_cnt_ = 0;
+/*     new_loop_cnt_ = 0; */
+    new_key_frame_cnt_ = 0;// 清除计数,以便下一次优化判断
 
     if (graph_optimizer_ptr_->Optimize())
-        has_new_optimized_ = true;
+        has_new_optimized_ = true;// 优化成功标志
 
     return true;
 }
@@ -332,7 +333,7 @@ void BackEnd::GetOptimizedKeyFrames(std::deque<KeyFrame>& key_frames_deque) {
     KeyFrame key_frame;
     for (size_t i = 0; i < optimized_pose_.size(); ++i) {
         key_frame.pose = optimized_pose_.at(i);
-        key_frame.index = (unsigned int)i;
+        key_frame.index = i;
         key_frames_deque.push_back(key_frame);
     }
 }

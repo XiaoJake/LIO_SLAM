@@ -1,5 +1,5 @@
 /*
- * @Description: 数据预处理模块，包括时间同步、点云去畸变等
+ * @Description: 数据预处理模块，包括去除过近点、时间同步、点云去畸变等
  * @Author: Zhang Jun
  * @Date: 2020-07-17 10:38:42
  */
@@ -9,13 +9,14 @@
 #include "lio_slam/global_defination/global_defination.h"
 
 namespace lio_slam {
+
 DataPretreatFlow::DataPretreatFlow(ros::NodeHandle& nh, std::string cloud_topic) {
     // subscriber
-    cloud_sub_ptr_ = std::make_shared<CloudSubscriber>(nh, "/velodyne_points", 100000);//   /kitti/velo/pointcloud
-    imu_sub_ptr_ = std::make_shared<IMUSubscriber>(nh, "/imu/data", 1000000);// /kitti/oxts/imu
+    cloud_sub_ptr_ = std::make_shared<CloudSubscriber>(nh, "/velodyne_points", 10000);//   /kitti/velo/pointcloud
+    imu_sub_ptr_ = std::make_shared<IMUSubscriber>(nh, "/imu/data", 10000);// /kitti/oxts/imu
     lidar_to_imu_ptr_ = std::make_shared<TFListener>(nh, "/imu_link", "/laser_link");
-/*     velocity_sub_ptr_ = std::make_shared<VelocitySubscriber>(nh, "/kitti/oxts/gps/vel", 1000000);
-    gnss_sub_ptr_ = std::make_shared<GNSSSubscriber>(nh, "/kitti/oxts/gps/fix", 1000000); */
+/*     velocity_sub_ptr_ = std::make_shared<VelocitySubscriber>(nh, "/kitti/oxts/gps/vel", 10000);
+    gnss_sub_ptr_ = std::make_shared<GNSSSubscriber>(nh, "/kitti/oxts/gps/fix", 10000); */
 
     // publisher
     cloud_pub_ptr_ = std::make_shared<CloudPublisher>(nh, cloud_topic, "/laser_link", 100);
@@ -162,6 +163,7 @@ bool DataPretreatFlow::ValidData() {
         return false;
     } */
 
+    // 当前点云已经完成存储,需要弹出 一是节省空间 二是, cloud_data_buff_.front()就能代表容器里的下帧点云了
     cloud_data_buff_.pop_front();
     imu_data_buff_.pop_front();
 /*     velocity_data_buff_.pop_front();

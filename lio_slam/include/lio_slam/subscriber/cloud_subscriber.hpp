@@ -25,6 +25,8 @@ class CloudSubscriber {
     CloudSubscriber(ros::NodeHandle& nh, std::string topic_name, size_t buff_size);
     CloudSubscriber() = default;
     void ParseData(std::deque<CloudData>& deque_cloud_data);
+    template <typename PointT>
+    void limitDistancePointCloud(const pcl::PointCloud<PointT> &cloud_in,pcl::PointCloud<PointT> &cloud_out, float head,float end);
 
   private:
     void msg_callback(const sensor_msgs::PointCloud2::ConstPtr& cloud_msg_ptr);

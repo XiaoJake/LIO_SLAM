@@ -1,7 +1,7 @@
 /*
  * @Description: 订阅velocity数据
  * @Author: Zhang Jun
- * @Date: 2019-08-19 19:22:17
+ * @Date: 2020-08-1 19:22:17
  */
 #ifndef LIO_SLAM_SUBSCRIBER_VELOCITY_SUBSCRIBER_HPP_
 #define LIO_SLAM_SUBSCRIBER_VELOCITY_SUBSCRIBER_HPP_

@@ -1,7 +1,7 @@
 /*
  * @Description: 
  * @Author: Zhang Jun
- * @Date: 2019-08-5 12:58:10
+ * @Date: 2020-08-5 12:58:10
  */
 #ifndef LIO_SLAM_SUBSCRIBER_GNSS_SUBSCRIBER_HPP_
 #define LIO_SLAM_SUBSCRIBER_GNSS_SUBSCRIBER_HPP_

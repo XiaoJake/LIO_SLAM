@@ -12,7 +12,7 @@ namespace lio_slam {
 class KeyFrame {
   public:
     double time = 0.0;
-    unsigned int index = 0;
+    size_t index = 0;
     Eigen::Matrix4f pose = Eigen::Matrix4f::Identity();
 
   public:

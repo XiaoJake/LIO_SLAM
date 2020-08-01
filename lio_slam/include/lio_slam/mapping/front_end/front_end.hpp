@@ -50,7 +50,7 @@ class FrontEnd {
     Eigen::Matrix4f init_pose_ = Eigen::Matrix4f::Identity();
 
     float key_frame_distance_ = 2.0;
-    int local_frame_num_ = 20;
+    size_t local_frame_num_ = 20;
 };
 }
 

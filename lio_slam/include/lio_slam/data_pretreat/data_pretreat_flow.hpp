@@ -23,6 +23,7 @@ namespace lio_slam {
 class DataPretreatFlow {
   public:
     DataPretreatFlow(ros::NodeHandle& nh, std::string cloud_topic);
+    void removeClosedPointCloud(const CloudData& cloud_in,CloudData& cloud_out, float thres);
 
     bool Run();
 

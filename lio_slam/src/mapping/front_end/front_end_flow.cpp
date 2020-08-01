@@ -42,6 +42,7 @@ bool FrontEndFlow::HasData() {
 
 bool FrontEndFlow::ValidData() {
     current_cloud_data_ = cloud_data_buff_.front();
+
     cloud_data_buff_.pop_front();
 
     return true;
@@ -51,10 +52,11 @@ bool FrontEndFlow::UpdateLaserOdometry() {
     static bool odometry_inited = false;
     if (!odometry_inited) {
         odometry_inited = true;
+        // 初始位姿直接置0，相当于以启动点作为全局的起点。  如果有其它数据源，比如gps，可以以gps的位姿来初始化，以获得启动点在全局坐标系中的绝对位姿点
         front_end_ptr_->SetInitPose(Eigen::Matrix4f::Identity());
-        return front_end_ptr_->Update(current_cloud_data_, laser_odometry_);
     }
 
+    // 进行激光雷达里程计的更新
     return front_end_ptr_->Update(current_cloud_data_, laser_odometry_);
 }
 

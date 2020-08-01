@@ -91,7 +91,7 @@ bool Viewer::UpdateWithNewKeyFrame(std::deque<KeyFrame>& new_key_frames,
             key_frame.pose = pose_to_optimize_ * key_frame.pose;
             all_key_frames_.push_back(key_frame);
         }
-        new_key_frames.clear();
+        new_key_frames.clear();// 清空此次读取到的位姿关键帧
         has_new_local_map_ = true;
     }
 
@@ -111,7 +111,7 @@ bool Viewer::OptimizeKeyFrames() {
     while (optimized_index < optimized_key_frames_.size() && all_index < all_key_frames_.size()) {
         if (optimized_key_frames_.at(optimized_index).index < all_key_frames_.at(all_index).index) {
             optimized_index ++;
-        } else if (optimized_key_frames_.at(optimized_index).index > all_key_frames_.at(all_index).index) {
+        } else if (optimized_key_frames_.at(optimized_index).index < all_key_frames_.at(all_index).index) {
             all_index ++;
         } else {
             pose_to_optimize_ = optimized_key_frames_.at(optimized_index).pose * all_key_frames_.at(all_index).pose.inverse();
@@ -175,7 +175,7 @@ bool Viewer::SaveMap() {
     std::string map_file_path = map_path_ + "/map.pcd";
     pcl::io::savePCDFileBinary(map_file_path, *global_map_ptr);
     // 往硬盘中保存滤波后地图
-    if (global_map_ptr->points.size() > 1000000) {
+    if (global_map_ptr->points.size() > 10000) {
         std::shared_ptr<VoxelFilter> map_filter_ptr = std::make_shared<VoxelFilter>(0.5, 0.5, 0.5);
         map_filter_ptr->Filter(global_map_ptr, global_map_ptr);
     }

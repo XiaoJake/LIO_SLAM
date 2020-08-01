@@ -1,7 +1,7 @@
 /*
  * @Description: velocity 数据
  * @Author: Zhang Jun
- * @Date: 2019-07-17 18:27:40
+ * @Date: 2020-07-17 18:27:40
  */
 #ifndef LIO_SLAM_SENSOR_DATA_VELOCITY_DATA_HPP_
 #define LIO_SLAM_SENSOR_DATA_VELOCITY_DATA_HPP_

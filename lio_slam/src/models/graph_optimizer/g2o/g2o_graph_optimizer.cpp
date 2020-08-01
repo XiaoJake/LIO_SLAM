@@ -69,7 +69,7 @@ void G2oGraphOptimizer::AddSe3Node(const Eigen::Isometry3d &pose, bool need_fix)
     vertex->setId(graph_ptr_->vertices().size());
     vertex->setEstimate(pose);
     if (need_fix) {
-        vertex->setFixed(true);
+        vertex->setFixed(true);// 对第一个节点进行 固定
     }
     graph_ptr_->addVertex(vertex);
 }
