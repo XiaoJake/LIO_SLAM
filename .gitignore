@@ -1,0 +1,7 @@
+CMakeLists.txt
+nohup.out
+setup_file/g2o/
+../build/
+lio_slam/Log
+lio_slam/slam_data
+

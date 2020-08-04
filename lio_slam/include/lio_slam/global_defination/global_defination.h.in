@@ -1,0 +1,14 @@
+/*
+ * @Description: 
+ * @Author: Zhang Jun
+ * @Date: 2020-07-15 02:27:30
+ */
+#ifndef LIO_SLAM_GLOBAL_DEFINATION_H_IN_
+#define LIO_SLAM_GLOBAL_DEFINATION_H_IN_
+
+#include <string>
+
+namespace lio_slam {
+const std::string WORK_SPACE_PATH = "@WORK_SPACE_PATH@";
+}
+#endif

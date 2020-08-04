@@ -1,0 +1,14 @@
+<launch>
+    <!-- 当传感器数据源来自bag包时,设为true  真实机器人跑,用false  -->
+    <param name="/use_sim_time" value="true" />
+    <!-- <param name="cloud_topic" type="string" value="/velodyne_points" /> -->
+
+    <param name="robot_description" textfile="$(find lio_slam)/urdf/robot.urdf" />
+    <node pkg="robot_state_publisher" type="robot_state_publisher" name="state_publisher"/>
+
+    <node pkg="rviz"  type="rviz"  name="rviz"  args="-d $(find lio_slam)/rviz/mapping_no_loop.rviz"></node>
+    <node pkg="lio_slam"  type="data_pretreat_node"  name="data_pretreat_node"  output="screen"></node>
+    <node pkg="lio_slam"  type="front_end_node"  name="front_end_node"  output="screen"></node>
+    <node pkg="lio_slam"  type="back_end_node"  name="back_end_node"  output="screen"></node>
+    <node pkg="lio_slam"  type="viewer_node"  name="viewer_node"  output="screen"></node>
+</launch>

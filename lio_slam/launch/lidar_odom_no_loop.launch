@@ -1,0 +1,42 @@
+<!--
+
+  <param name="robot_description"
+  textfile="$(find cartographer_ros)/urdf/backpack_2d.urdf" />
+ 
+  <node name="robot_state_publisher" pkg="robot_state_publisher"
+  type="robot_state_publisher" />
+
+        <arg name = "source_points" value = "/synced_cloud" />
+
+
+
+-->
+
+<launch>
+
+<!-- 当传感器数据源来自bag包时,设为true  真实机器人跑,用false  -->
+    <param name="/use_sim_time" value="true" />
+
+    <param name="odom_topic" type="string" value="/aft_mapped_to_init" />
+    
+    <param name="robot_description" textfile="$(find lio_slam)/urdf/robot.urdf" />
+    <node pkg="robot_state_publisher" type="robot_state_publisher" name="state_publisher">
+       <!--  <param name="publish_frequency" type="double" value="5.0" /> -->
+    </node>
+
+    <include file="$(find aloam_velodyne)/launch/aloam_my_vlp16.launch">
+
+    </include>
+
+    <node pkg="lio_slam"  type="back_end_node"  name="back_end_node"  output="screen"></node>
+    <!-- <node pkg="lio_slam"  type="loop_closing_node"  name="loop_closing_node"  output="screen"></node> -->
+    <!-- 局部地图 全局地图的发布与显示-->
+    <node pkg="lio_slam"  type="viewer_node"  name="viewer_node"  output="screen"></node>
+
+    <!-- mode_debug=true:平时调试机器人需要有可视化的界面,来观察算法效果，同时以 nice 参数，来降低rviz的cpu使用率，毕竟只是拿来看的。 mode_debug=false：当机器人投入运行时，就关闭rviz，节约一部分运算资源-->
+    <arg name="mode_debug" default="true" />
+    <group if="$(arg mode_debug)">
+        <node launch-prefix="nice" pkg="rviz" type="rviz" name="rviz" args="-d $(find lio_slam)/rviz/lidar_odom_no_loop.rviz" />
+    </group>
+
+</launch>
