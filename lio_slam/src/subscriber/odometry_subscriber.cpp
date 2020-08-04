@@ -7,12 +7,40 @@
 #include "glog/logging.h"
 
 namespace lio_slam{
-OdometrySubscriber::OdometrySubscriber(ros::NodeHandle& nh, std::string topic_name, size_t buff_size)
+OdometrySubscriber::OdometrySubscriber(ros::NodeHandle& nh, std::string topic_name, size_t buff_size,char mode)
     :nh_(nh) {
-    subscriber_ = nh_.subscribe(topic_name, buff_size, &OdometrySubscriber::msg_callback, this);
+        if(mode == 1)
+            subscriber_ = nh_.subscribe(topic_name, buff_size, &OdometrySubscriber::msg1_callback, this);
+        else if(mode == 2)
+            subscriber_ = nh_.subscribe(topic_name, buff_size, &OdometrySubscriber::msg2_callback, this);
+        else
+            std::cout << "please input legal number,1 or 2" << std::endl;
+        
 }
 
-void OdometrySubscriber::msg_callback(const nav_msgs::OdometryConstPtr& odom_msg_ptr) {
+void OdometrySubscriber::msg1_callback(const nav_msgs::OdometryConstPtr& odom_msg_ptr) {
+    buff_mutex_.lock();
+    PoseData pose_data;
+    pose_data.time = odom_msg_ptr->header.stamp.toSec();
+
+    //set the position
+    pose_data.pose(0,3) = odom_msg_ptr->pose.pose.position.x;
+    pose_data.pose(1,3) = odom_msg_ptr->pose.pose.position.y;
+    pose_data.pose(2,3) = odom_msg_ptr->pose.pose.position.z;
+
+    Eigen::Quaternionf q;
+    q.x() = odom_msg_ptr->pose.pose.orientation.x;
+    q.y() = odom_msg_ptr->pose.pose.orientation.y;
+    q.z() = odom_msg_ptr->pose.pose.orientation.z;
+    q.w() = odom_msg_ptr->pose.pose.orientation.w;
+    pose_data.pose.block<3,3>(0,0) = q.matrix();
+
+    new_pose_data_.push_back(pose_data);
+    buff_mutex_.unlock();
+}
+
+// 这是为了兼容 robot_pose_ekf 发布的话题数据类型
+void OdometrySubscriber::msg2_callback(const geometry_msgs::PoseWithCovarianceStampedPtr& odom_msg_ptr) {
     buff_mutex_.lock();
     PoseData pose_data;
     pose_data.time = odom_msg_ptr->header.stamp.toSec();

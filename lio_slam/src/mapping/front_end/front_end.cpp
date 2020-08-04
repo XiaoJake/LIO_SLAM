@@ -90,10 +90,10 @@ bool FrontEnd::Update(const CloudData& cloud_data, Eigen::Matrix4f& cloud_pose) 
     // 局部地图容器中没有关键帧，代表是第一帧数据
     // 此时把当前帧数据作为第一个关键帧，并更新局部地图容器和全局地图容器
     if (local_map_frames_.size() == 0) {
-        current_frame_.pose = init_pose_;
+        current_frame_.pose = init_pose_;// 完成第一帧点云的 位姿初始化
         UpdateWithNewFrame(current_frame_);
 
-        // // 假定机器人在理想平面移动,只有x,y和z轴旋转角度
+        // // 假定机器人在理想平面移动,只有x,y平移和z轴旋转角度
         // // 将roll和pitch设为0
         // Eigen::Vector3d eulerAngle = current_frame_.pose.eulerAngles(2,1,0);
         // double z = eulerAngle(2);// 取得z轴旋转角度
@@ -112,13 +112,8 @@ bool FrontEnd::Update(const CloudData& cloud_data, Eigen::Matrix4f& cloud_pose) 
     CloudData::CLOUD_PTR result_cloud_ptr(new CloudData::CLOUD());// ??? 这里的result_cloud_ptr 让我有点迷,后面都没用到啊
     registration_ptr_->ScanMatch(filtered_cloud_ptr, predict_pose, result_cloud_ptr, current_frame_.pose);
 
-        // // 假定机器人在理想平面移动,只有x,y和z轴旋转角度
+        // // 假定机器人在理想平面移动,只有x,y平移和z轴旋转角度
         // // 将roll和pitch设为0
-        // Eigen::Vector3d eulerAngle = current_frame_.pose.eulerAngles(2,1,0);
-        // double z = eulerAngle(2);// 取得z轴旋转角度
-        // current_frame_.pose(0,0) = cos(z);current_frame_.pose(0,1) = -sin(z);current_frame_.pose(0,2) = 0;
-        // current_frame_.pose(1,0) = sin(z);current_frame_.pose(1,1) = cos(z);current_frame_.pose(1,2) = 0;
-        // current_frame_.pose(2,0) = 0;current_frame_.pose(2,1) = 0;current_frame_.pose(2,2) = 1;
         current_frame_.pose(0,2) = 0;current_frame_.pose(1,2) = 0;current_frame_.pose(2,2) = 1;
         current_frame_.pose(2,0) = 0;current_frame_.pose(2,1) = 0;
         current_frame_.pose(2,3) = 0;// 将z轴位置设为0
@@ -127,8 +122,8 @@ bool FrontEnd::Update(const CloudData& cloud_data, Eigen::Matrix4f& cloud_pose) 
 
     // 更新相邻两帧的相对运动。采用匀速运动模型进行位姿预测:上一帧到当前帧的移动位姿=当前帧到下一阵的移动位姿
     // TODO 以imu估计姿态作为 位姿预
-    step_pose = last_pose.inverse() * current_frame_.pose;// 
-    predict_pose = current_frame_.pose * step_pose;
+    step_pose = last_pose.inverse() * current_frame_.pose;// 当前帧位姿变换矩阵 左乘 上一时刻位姿的逆 = 相对于上一时刻的移动步长
+    predict_pose = current_frame_.pose * step_pose;// 当前帧位姿变换矩阵 右乘 移动步长 = 预测的下一帧位姿
     last_pose = current_frame_.pose;
 
     // 匹配之后根据扫描帧之间的 曼哈顿距离 判断是否需要生成新的关键帧，如果需要，则做相应更新

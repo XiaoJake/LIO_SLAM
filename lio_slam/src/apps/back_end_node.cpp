@@ -31,8 +31,9 @@ int main(int argc, char *argv[]) {
 
     std::string cloud_topic, odom_topic;
     nh.param<std::string>("cloud_topic", cloud_topic, "/synced_cloud");
-    nh.param<std::string>("odom_topic", odom_topic, "/laser_odom");
-
+    //nh.param<std::string>("odom_topic", odom_topic, "/laser_odom");
+    odom_topic = "/robot_pose_ekf/odom_combined";
+    
     ros::ServiceServer service = nh.advertiseService("optimize_map", optimize_map_callback);
     _back_end_flow_ptr = std::make_shared<BackEndFlow>(nh, cloud_topic, odom_topic);
 

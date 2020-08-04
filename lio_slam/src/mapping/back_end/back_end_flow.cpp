@@ -4,7 +4,6 @@
  * @Date: 2020-07-17 10:38:42
  */
 #include "lio_slam/mapping/back_end/back_end_flow.hpp"
-#include "lio_slam/publisher/tf_broadcaster.hpp"
 
 #include "glog/logging.h"
 
@@ -14,7 +13,7 @@
 namespace lio_slam {
 BackEndFlow::BackEndFlow(ros::NodeHandle& nh, std::string cloud_topic, std::string odom_topic) {
     cloud_sub_ptr_ = std::make_shared<CloudSubscriber>(nh, cloud_topic, 100000);
-    laser_odom_sub_ptr_ = std::make_shared<OdometrySubscriber>(nh, odom_topic, 100000);
+    laser_odom_sub_ptr_ = std::make_shared<OdometrySubscriber>(nh, odom_topic, 100000, 2);
     base_to_odom_ptr_ = std::make_shared<TFListener>(nh, "odom", "base_link");
 /*     loop_pose_sub_ptr_ = std::make_shared<LoopPoseSubscriber>(nh, "/loop_pose", 100000); */
 /*     gnss_pose_sub_ptr_ = std::make_shared<OdometrySubscriber>(nh, "/synced_gnss", 100000); */
@@ -139,11 +138,11 @@ bool BackEndFlow::UpdateBackEnd() {
 
 bool BackEndFlow::PublishData() {
     
-    transformed_odom_pub_ptr_->Publish(current_laser_odom_data_.pose, current_laser_odom_data_.time);
+    transformed_odom_pub_ptr_->Publish(current_laser_odom_data_.pose);
 
-     //base_to_odom_ptr_->LookupData(base_to_odom_);
-     laser_tf_pub_ptr_->SendTransform(current_laser_odom_data_.pose);
-     map_tf_pub_ptr_->SendTransform(Eigen::Matrix4f::Identity());// 目前因为只有里程计,没有定位系统,所以假定 /map和/odom坐标系是重合的
+    // 发布tf坐标转换 odom->base_link
+    laser_tf_pub_ptr_->SendTransform(current_laser_odom_data_.pose);
+    map_tf_pub_ptr_->SendTransform(Eigen::Matrix4f::Identity());// 目前因为只有里程计,没有定位系统,所以假定 /map和/odom坐标系是重合的
 
     if (back_end_ptr_->HasNewKeyFrame()) {
         KeyFrame key_frame;

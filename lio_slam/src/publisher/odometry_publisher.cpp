@@ -42,6 +42,8 @@ void OdometryPublisher::PublishData(const Eigen::Matrix4f& transform_matrix, ros
     odometry_.pose.pose.orientation.z = q.z();
     odometry_.pose.pose.orientation.w = q.w();
 
+    //待设置里程计的协方差矩阵
+
     publisher_.publish(odometry_);
 }
 

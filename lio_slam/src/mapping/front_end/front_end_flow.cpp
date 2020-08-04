@@ -61,7 +61,7 @@ bool FrontEndFlow::UpdateLaserOdometry() {
 }
 
 bool FrontEndFlow::PublishData() {
-    laser_odom_pub_ptr_->Publish(laser_odometry_, current_cloud_data_.time);
+    laser_odom_pub_ptr_->Publish(laser_odometry_);
 
     return true;
 }
