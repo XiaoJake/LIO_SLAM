@@ -8,8 +8,8 @@ registration_method: NDT   # 选择点云匹配方法，目前支持：NDT
 frame_filter: voxel_filter # 选择当前帧点云滤波方法，目前支持：voxel_filter、no_filter
 
 # 局部地图
-key_frame_distance: 1.5 # 关键帧距离
-local_frame_num: 10
+key_frame_distance: 1.0 # 关键帧距离
+local_frame_num: 20
 local_map_filter: voxel_filter # 选择滑窗地图点云滤波方法，目前支持：voxel_filter、no_filter
 
 
@@ -17,12 +17,23 @@ local_map_filter: voxel_filter # 选择滑窗地图点云滤波方法，目前�
 ## 匹配相关参数
 NDT:
     res : 1.0
-    step_size : 0.1
+    step_size : 0.04
     trans_eps : 0.01
     max_iter : 30
-## 滤波相关参数  室外可以稍微大些,如0.5-2.0;室内需要小一些
+## 体素滤波相关参数  室外要大些,如0.5-2.0;室内需要小一些
 voxel_filter:
     local_map:
         leaf_size: [0.1, 0.1, 0.1]
     frame:
-        leaf_size: [0.1, 0.1, 0.1]
+        leaf_size: [0.2, 0.2, 0.2]
+
+
+    #local_map:
+    #    leaf_size: [0.2, 0.2, 0.2]
+    #frame:
+    #    leaf_size: [0.4, 0.4, 0.4]
+
+    #local_map:
+    #    leaf_size: [0.125, 0.125, 0.125]
+    #frame:
+    #    leaf_size: [0.25, 0.25, 0.25]

@@ -191,7 +191,8 @@ bool DataPretreatFlow::TransformData() {
 }
 
 bool DataPretreatFlow::PublishData() {
-    cloud_pub_ptr_->Publish(current_cloud_data_.cloud_ptr);
+    cloud_pub_ptr_->Publish(current_cloud_data_.cloud_ptr,current_cloud_data_.time);
+    //cloud_pub_ptr_->Publish(current_cloud_data_.cloud_ptr);
 /*     gnss_pub_ptr_->Publish(gnss_pose_, current_gnss_data_.time); */
 
     return true;

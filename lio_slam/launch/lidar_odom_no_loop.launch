@@ -25,7 +25,7 @@
     </node>
 
     <include file="$(find aloam_velodyne)/launch/aloam_my_vlp16.launch">
-
+            <arg name="rviz" value="false"/>
     </include>
 
     <node pkg="lio_slam"  type="back_end_node"  name="back_end_node"  output="screen"></node>

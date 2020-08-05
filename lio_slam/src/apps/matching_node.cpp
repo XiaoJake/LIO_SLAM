@@ -21,7 +21,7 @@ int main(int argc, char *argv[]) {
 
     std::shared_ptr<MatchingFlow> matching_flow_ptr = std::make_shared<MatchingFlow>(nh);
 
-    ros::Rate rate(100);
+    ros::Rate rate(50);
     while (ros::ok()) {
         ros::spinOnce();
 

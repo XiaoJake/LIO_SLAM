@@ -130,7 +130,7 @@ bool BackEnd::InsertLoopPose(const LoopPose& loop_pose) {
     graph_optimizer_ptr_->AddSe3Edge(loop_pose.index0, loop_pose.index1, isometry, graph_optimizer_config_.close_loop_noise);
 
     new_loop_cnt_ ++;
-    // LOG(INFO) << "插入闭环：" << loop_pose.index0 << "," << loop_pose.index1;
+    LOG(INFO) << "插入闭环：" << loop_pose.index0 << "," << loop_pose.index1;
 
     return true;
 }

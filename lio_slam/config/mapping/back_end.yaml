@@ -1,7 +1,7 @@
 data_path: ./   # 数据存放路径
 
 # 关键帧
-key_frame_distance: 2.0 # 关键帧距离
+key_frame_distance: 1.0 # 关键帧距离
 
 # 优化
 graph_optimizer_type: g2o # 图优化库，目前支持g2o
@@ -10,8 +10,8 @@ use_gnss: false #false 不使用gnss,关闭闭环检测,变成开环里程计
 use_loop_close: true
 
 
-optimize_step_with_key_frame: 40 # 没有其他信息时，每隔 step 发送一次优化的位姿
-optimize_step_with_gnss: 40 # 每累计 step 个 gnss 观测时，优化一次
+optimize_step_with_key_frame: 60 # 没有其他信息时，每隔 step 发送一次优化的位姿
+optimize_step_with_gnss: 60 # 每累计 step 个 gnss 观测时，优化一次
 optimize_step_with_loop: 1  # 每累计 step 个闭环约束时优化一次
 #当上面这三个条件满足其中之一时，即做优化，并把三个计数均清零。
 

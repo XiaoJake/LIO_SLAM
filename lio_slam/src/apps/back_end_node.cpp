@@ -37,7 +37,7 @@ int main(int argc, char *argv[]) {
     ros::ServiceServer service = nh.advertiseService("optimize_map", optimize_map_callback);
     _back_end_flow_ptr = std::make_shared<BackEndFlow>(nh, cloud_topic, odom_topic);
 
-    ros::Rate rate(100);
+    ros::Rate rate(50);
     while (ros::ok()) {
         ros::spinOnce();
 

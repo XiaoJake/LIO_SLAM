@@ -17,7 +17,7 @@ CloudPublisher::CloudPublisher(ros::NodeHandle& nh,
 }
 
 void CloudPublisher::Publish(CloudData::CLOUD_PTR&  cloud_ptr_input, double time) {
-    ros::Time ros_time((float)time);
+    ros::Time ros_time = ros::Time().fromSec(time);//把浮点型变成时间戳
     PublishData(cloud_ptr_input, ros_time);
 }
 

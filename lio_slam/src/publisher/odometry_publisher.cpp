@@ -19,7 +19,7 @@ OdometryPublisher::OdometryPublisher(ros::NodeHandle& nh,
 }
 
 void OdometryPublisher::Publish(const Eigen::Matrix4f& transform_matrix, double time) {
-    ros::Time ros_time((float)time);
+    ros::Time ros_time = ros::Time().fromSec(time);//把浮点型变成时间戳
     PublishData(transform_matrix, ros_time);
 }
 

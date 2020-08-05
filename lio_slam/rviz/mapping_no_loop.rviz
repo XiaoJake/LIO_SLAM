@@ -6,15 +6,15 @@ Panels:
       Expanded:
         - /Global Options1
         - /Status1
-        - /trajectory1
         - /trajectory1/gnss_pose1/Shape1
         - /trajectory1/laser_odom1/Shape1
         - /trajectory1/optimized_odom1
-        - /trajectory1/optimized_odom1/Status1
         - /trajectory1/optimized_odom1/Shape1
-        - /PointCloud1
-        - /Imu1
+        - /TF1
         - /TF1/Frames1
+        - /TF1/Frames1/base_link1
+        - /TF1/Frames1/base_link1/Position1
+        - /TF1/Frames1/base_link1/Orientation1
         - /TF1/Tree1
       Splitter Ratio: 0.460869551
     Tree Height: 866
@@ -194,8 +194,8 @@ Visualization Manager:
         - Alpha: 0.300000012
           Autocompute Intensity Bounds: true
           Autocompute Value Bounds:
-            Max Value: 4.21198368
-            Min Value: -3.30948424
+            Max Value: 3.67410612
+            Min Value: -2.8562932
             Value: true
           Axis: Z
           Channel Name: intensity
@@ -347,25 +347,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/XYOrbit
-      Distance: 93.2304535
+      Distance: 43.5736389
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.0599999987
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: -3.42477846
-        Y: -7.82897472
-        Z: -7.62939453e-06
+        X: -6.56026077
+        Y: 4.29314995
+        Z: -1.14440918e-05
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.0500000007
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.00999999978
-      Pitch: 1.20479667
+      Pitch: 1.30479574
       Target Frame: base_link
       Value: XYOrbit (rviz)
-      Yaw: 3.15921307
+      Yaw: 3.17921662
     Saved: ~
 Window Geometry:
   Displays:

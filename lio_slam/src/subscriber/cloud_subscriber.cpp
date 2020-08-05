@@ -65,7 +65,7 @@ void CloudSubscriber::ParseData(std::deque<CloudData>& cloud_data_buff) {
         // 去除原始激光点云里无效的NaN点:输入点云，输出点云，索引
         std::vector<int> indices;
         pcl::removeNaNFromPointCloud(*new_cloud_data_.at(i).cloud_ptr, *new_cloud_data_.at(i).cloud_ptr, indices);
-        limitDistancePointCloud(*new_cloud_data_.at(i).cloud_ptr, *new_cloud_data_.at(i).cloud_ptr, 0.2, 40.0);
+        limitDistancePointCloud(*new_cloud_data_.at(i).cloud_ptr, *new_cloud_data_.at(i).cloud_ptr, 0.3, 50.0);
     }
 
         cloud_data_buff.insert(cloud_data_buff.end(), new_cloud_data_.begin(), new_cloud_data_.end());

@@ -15,7 +15,7 @@ BackEndFlow::BackEndFlow(ros::NodeHandle& nh, std::string cloud_topic, std::stri
     cloud_sub_ptr_ = std::make_shared<CloudSubscriber>(nh, cloud_topic, 100000);
     laser_odom_sub_ptr_ = std::make_shared<OdometrySubscriber>(nh, odom_topic, 100000, 2);
     base_to_odom_ptr_ = std::make_shared<TFListener>(nh, "odom", "base_link");
-/*     loop_pose_sub_ptr_ = std::make_shared<LoopPoseSubscriber>(nh, "/loop_pose", 100000); */
+    loop_pose_sub_ptr_ = std::make_shared<LoopPoseSubscriber>(nh, "/loop_pose", 10000);
 /*     gnss_pose_sub_ptr_ = std::make_shared<OdometrySubscriber>(nh, "/synced_gnss", 100000); */
 
     transformed_odom_pub_ptr_ = std::make_shared<OdometryPublisher>(nh, "/transformed_odom", "odom", "base_link", 100);
@@ -33,7 +33,7 @@ bool BackEndFlow::Run() {
     if (!ReadData())
         return false;
     
-/*     MaybeInsertLoopPose(); */
+    MaybeInsertLoopPose();
 
     while(HasData()) {
         if (!ValidData())
@@ -122,7 +122,7 @@ bool BackEndFlow::ValidData() {
 
 bool BackEndFlow::UpdateBackEnd() {
 
-    //TODO 目前没有gnss，如何去做这个里程计初始位姿的初始化
+    //TODO 目前没有gnss，如何去做这个里程计位姿对齐?
     //主要是把odom轨迹先旋转一下，弄到和gnss轨迹初始对齐，再去优化
 /*     static bool odometry_inited = false;
     static Eigen::Matrix4f odom_init_pose = Eigen::Matrix4f::Identity();
@@ -138,7 +138,7 @@ bool BackEndFlow::UpdateBackEnd() {
 
 bool BackEndFlow::PublishData() {
     
-    transformed_odom_pub_ptr_->Publish(current_laser_odom_data_.pose);
+    transformed_odom_pub_ptr_->Publish(current_laser_odom_data_.pose,current_laser_odom_data_.time);
 
     // 发布tf坐标转换 odom->base_link
     laser_tf_pub_ptr_->SendTransform(current_laser_odom_data_.pose);

@@ -21,7 +21,7 @@ int main(int argc, char *argv[]) {
 
     std::shared_ptr<LoopClosingFlow> loop_closing_flow_ptr = std::make_shared<LoopClosingFlow>(nh);
 
-    ros::Rate rate(100);
+    ros::Rate rate(50);
     while (ros::ok()) {
         ros::spinOnce();
 
