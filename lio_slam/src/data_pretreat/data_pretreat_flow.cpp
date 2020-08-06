@@ -97,7 +97,7 @@ bool DataPretreatFlow::ReadData() {
     return true;
 }
 
-//TODO 基于Lidar-IMU联合标定的外参,完成lidar到imu的数据校准 > 计划用 写入urdf模型后robot_state_publisher发布的方式 完成
+// 基于Lidar-IMU联合标定的外参,完成lidar到imu的数据校准
 bool DataPretreatFlow::InitCalibration() {
     static bool calibration_received = false;
     if (!calibration_received) {

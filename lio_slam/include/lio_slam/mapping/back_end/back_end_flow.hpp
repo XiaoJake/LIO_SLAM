@@ -42,7 +42,8 @@ class BackEndFlow {
     std::shared_ptr<OdometrySubscriber> gnss_pose_sub_ptr_;
     std::shared_ptr<OdometrySubscriber> laser_odom_sub_ptr_;
     std::shared_ptr<LoopPoseSubscriber> loop_pose_sub_ptr_;
-    std::shared_ptr<TFListener> base_to_odom_ptr_;
+    std::shared_ptr<TFListener> lidar_to_base_ptr_;
+    Eigen::Matrix4f lidar_to_base_ = Eigen::Matrix4f::Identity();
 
     std::shared_ptr<OdometryPublisher> transformed_odom_pub_ptr_;
     std::shared_ptr<KeyFramePublisher> key_frame_pub_ptr_;

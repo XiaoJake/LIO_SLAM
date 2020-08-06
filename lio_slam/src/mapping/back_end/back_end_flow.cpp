@@ -14,7 +14,7 @@ namespace lio_slam {
 BackEndFlow::BackEndFlow(ros::NodeHandle& nh, std::string cloud_topic, std::string odom_topic) {
     cloud_sub_ptr_ = std::make_shared<CloudSubscriber>(nh, cloud_topic, 100000);
     laser_odom_sub_ptr_ = std::make_shared<OdometrySubscriber>(nh, odom_topic, 100000, 2);
-    base_to_odom_ptr_ = std::make_shared<TFListener>(nh, "odom", "base_link");
+    lidar_to_base_ptr_ = std::make_shared<TFListener>(nh, "laser_link", "base_link");
     loop_pose_sub_ptr_ = std::make_shared<LoopPoseSubscriber>(nh, "/loop_pose", 10000);
 /*     gnss_pose_sub_ptr_ = std::make_shared<OdometrySubscriber>(nh, "/synced_gnss", 100000); */
 
@@ -60,8 +60,8 @@ bool BackEndFlow::ForceOptimize() {
 bool BackEndFlow::ReadData() {
     cloud_sub_ptr_->ParseData(cloud_data_buff_);
     laser_odom_sub_ptr_->ParseData(laser_odom_data_buff_);
-/*     loop_pose_sub_ptr_->ParseData(loop_pose_data_buff_);
-    gnss_pose_sub_ptr_->ParseData(gnss_pose_data_buff_); */
+    loop_pose_sub_ptr_->ParseData(loop_pose_data_buff_);
+    /* gnss_pose_sub_ptr_->ParseData(gnss_pose_data_buff_); */
 
     return true;
 }
@@ -133,16 +133,16 @@ bool BackEndFlow::UpdateBackEnd() {
     }
     current_laser_odom_data_.pose = odom_init_pose * current_laser_odom_data_.pose; */
 
-    return back_end_ptr_->Update(current_cloud_data_, current_laser_odom_data_);
+    return back_end_ptr_->Update(current_cloud_data_, current_laser_odom_data_, current_gnss_pose_data_);
 }
 
 bool BackEndFlow::PublishData() {
-    
-    transformed_odom_pub_ptr_->Publish(current_laser_odom_data_.pose,current_laser_odom_data_.time);
 
     // 发布tf坐标转换 odom->base_link
     laser_tf_pub_ptr_->SendTransform(current_laser_odom_data_.pose);
     map_tf_pub_ptr_->SendTransform(Eigen::Matrix4f::Identity());// 目前因为只有里程计,没有定位系统,所以假定 /map和/odom坐标系是重合的
+
+    transformed_odom_pub_ptr_->Publish(current_laser_odom_data_.pose,current_laser_odom_data_.time);
 
     if (back_end_ptr_->HasNewKeyFrame()) {
         KeyFrame key_frame;

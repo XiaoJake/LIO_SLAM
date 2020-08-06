@@ -9,23 +9,23 @@ frame_filter: voxel_filter # 选择当前帧点云滤波方法，目前支持：
 
 # 局部地图
 key_frame_distance: 1.0 # 关键帧距离
-local_frame_num: 20
+local_frame_num: 10
 local_map_filter: voxel_filter # 选择滑窗地图点云滤波方法，目前支持：voxel_filter、no_filter
 
 
 # 各配置选项对应参数
 ## 匹配相关参数
 NDT:
-    res : 1.0
-    step_size : 0.04
-    trans_eps : 0.01
+    res : 1.6
+    step_size : 0.16
+    trans_eps : 0.02
     max_iter : 30
 ## 体素滤波相关参数  室外要大些,如0.5-2.0;室内需要小一些
 voxel_filter:
     local_map:
-        leaf_size: [0.1, 0.1, 0.1]
+        leaf_size: [0.11, 0.11, 0.11]
     frame:
-        leaf_size: [0.2, 0.2, 0.2]
+        leaf_size: [0.22, 0.22, 0.22]
 
 
     #local_map:
@@ -36,4 +36,32 @@ voxel_filter:
     #local_map:
     #    leaf_size: [0.125, 0.125, 0.125]
     #frame:
-    #    leaf_size: [0.25, 0.25, 0.25]
+    #    leaf_size: [0.2, 0.2, 0.2]
+
+    #local_map:
+    #    leaf_size: [0.08, 0.08, 0.08]
+    #frame:
+    #    leaf_size: [0.16, 0.16, 0.16]
+
+
+# NDT:
+#     res : 2.0
+#     step_size : 0.1
+#     trans_eps : 0.01
+#     max_iter : 30
+
+
+# # 局部地图
+# key_frame_distance: 1.0 # 关键帧距离
+# local_frame_num: 10
+# NDT:
+#     res : 2.0
+#     step_size : 0.16
+#     trans_eps : 0.01
+#     max_iter : 30
+# ## 体素滤波相关参数  室外要大些,如0.5-2.0;室内需要小一些
+# voxel_filter:
+#     local_map:
+#         leaf_size: [0.11, 0.11, 0.11]
+#     frame:
+#         leaf_size: [0.22, 0.22, 0.22]

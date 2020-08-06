@@ -22,6 +22,7 @@ class LoopClosing {
     LoopClosing();
 
     bool Update(const KeyFrame key_frame, const KeyFrame key_gnss);
+    bool Update(const KeyFrame key_frame);
 
     bool HasNewLoopPose();
     LoopPose& GetCurrentLoopPose();

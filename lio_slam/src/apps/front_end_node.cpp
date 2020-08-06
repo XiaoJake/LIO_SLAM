@@ -25,7 +25,7 @@ int main(int argc, char *argv[]) {
 
     std::shared_ptr<FrontEndFlow> front_end_flow_ptr = std::make_shared<FrontEndFlow>(nh, cloud_topic, odom_topic);
 
-    ros::Rate rate(50);
+    ros::Rate rate(100);
     while (ros::ok()) {
         ros::spinOnce();
 

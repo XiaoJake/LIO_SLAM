@@ -209,15 +209,17 @@ bool BackEnd::MaybeNewKeyFrame(const CloudData& cloud_data, const PoseData& lase
     }
 
     if (has_new_key_frame_) {
+
         // 把关键帧点云存储到硬盘里
         std::string file_path = key_frames_path_ + "/key_frame_" + std::to_string(key_frames_deque_.size()) + ".pcd";
         pcl::io::savePCDFileBinary(file_path, *cloud_data.cloud_ptr);
 
+        // 把关键帧位姿存储到运行内存里(这是是deque容器),因为位姿的数据量很小,不怎么占运行内存空间
         KeyFrame key_frame;
         key_frame.time = laser_odom.time;
-        key_frame.index = (unsigned int)key_frames_deque_.size();
+        key_frame.index = (size_t)key_frames_deque_.size();
         key_frame.pose = laser_odom.pose;
-        key_frames_deque_.push_back(key_frame);// 存储位姿关键帧
+        key_frames_deque_.push_back(key_frame);
         current_key_frame_ = key_frame;
 
     }
@@ -285,8 +287,8 @@ bool BackEnd::MaybeOptimized() {
 
 /*     if (new_gnss_cnt_ >= graph_optimizer_config_.optimize_step_with_gnss)
         need_optimize = true; */
-/*     if (new_loop_cnt_ >= graph_optimizer_config_.optimize_step_with_loop)
-        need_optimize = true; */
+    if (new_loop_cnt_ >= graph_optimizer_config_.optimize_step_with_loop)
+        need_optimize = true;
     // 以关键帧阈值数量来判断是否需要进行优化
     if (new_key_frame_cnt_ >= graph_optimizer_config_.optimize_step_with_key_frame)
         need_optimize = true;
@@ -295,7 +297,7 @@ bool BackEnd::MaybeOptimized() {
         return false;
 
 /*     new_gnss_cnt_ = 0; */
-/*     new_loop_cnt_ = 0; */
+    new_loop_cnt_ = 0;
     new_key_frame_cnt_ = 0;// 清除计数,以便下一次优化判断
 
     if (graph_optimizer_ptr_->Optimize())

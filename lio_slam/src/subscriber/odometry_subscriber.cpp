@@ -7,7 +7,7 @@
 #include "glog/logging.h"
 
 namespace lio_slam{
-OdometrySubscriber::OdometrySubscriber(ros::NodeHandle& nh, std::string topic_name, size_t buff_size,char mode)
+OdometrySubscriber::OdometrySubscriber(ros::NodeHandle& nh, std::string topic_name, size_t buff_size,char mode = 1)
     :nh_(nh) {
         if(mode == 1)
             subscriber_ = nh_.subscribe(topic_name, buff_size, &OdometrySubscriber::msg1_callback, this);

@@ -92,17 +92,9 @@ bool FrontEnd::Update(const CloudData& cloud_data, Eigen::Matrix4f& cloud_pose) 
     if (local_map_frames_.size() == 0) {
         current_frame_.pose = init_pose_;// 完成第一帧点云的 位姿初始化
         UpdateWithNewFrame(current_frame_);
-
-        // // 假定机器人在理想平面移动,只有x,y平移和z轴旋转角度
-        // // 将roll和pitch设为0
-        // Eigen::Vector3d eulerAngle = current_frame_.pose.eulerAngles(2,1,0);
-        // double z = eulerAngle(2);// 取得z轴旋转角度
-        // current_frame_.pose(0,0) = cos(z);current_frame_.pose(0,1) = -sin(z);current_frame_.pose(0,2) = 0;
-        // current_frame_.pose(1,0) = sin(z);current_frame_.pose(1,1) = cos(z);current_frame_.pose(1,2) = 0;
-        // current_frame_.pose(2,0) = 0;current_frame_.pose(2,1) = 0;current_frame_.pose(2,2) = 1;
         current_frame_.pose(0,2) = 0;current_frame_.pose(1,2) = 0;current_frame_.pose(2,2) = 1;
         current_frame_.pose(2,0) = 0;current_frame_.pose(2,1) = 0;
-        current_frame_.pose(2,3) = 0;// 将z轴位置设为0
+        current_frame_.pose(2,3) = 0;
 
         cloud_pose = current_frame_.pose;
         return true;
@@ -112,11 +104,9 @@ bool FrontEnd::Update(const CloudData& cloud_data, Eigen::Matrix4f& cloud_pose) 
     CloudData::CLOUD_PTR result_cloud_ptr(new CloudData::CLOUD());// ??? 这里的result_cloud_ptr 让我有点迷,后面都没用到啊
     registration_ptr_->ScanMatch(filtered_cloud_ptr, predict_pose, result_cloud_ptr, current_frame_.pose);
 
-        // // 假定机器人在理想平面移动,只有x,y平移和z轴旋转角度
-        // // 将roll和pitch设为0
         current_frame_.pose(0,2) = 0;current_frame_.pose(1,2) = 0;current_frame_.pose(2,2) = 1;
         current_frame_.pose(2,0) = 0;current_frame_.pose(2,1) = 0;
-        current_frame_.pose(2,3) = 0;// 将z轴位置设为0
+        current_frame_.pose(2,3) = 0;
 
     cloud_pose = current_frame_.pose; //匹配后的位姿就是 当前帧的位姿
 

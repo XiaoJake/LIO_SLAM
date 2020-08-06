@@ -46,13 +46,13 @@ imu相对于激光雷达的安装位姿 矩阵
     <joint name="imu_link_joint" type="fixed">
       <parent link="base_link" />
       <child link="imu_link" />
-      <origin xyz="0.2035142 0.00808116 0.922056" rpy="-0.001398042 -0.012606848 0.03765112"/>
+      <origin xyz="0.2035142 0.00808116 0.922056" rpy="-0.001398042 -0.012606848 0.02765112"/>
     </joint>
 
     <joint name="laser_link_joint" type="fixed">
       <parent link="base_link" />
       <child link="laser_link" />
-      <origin xyz="0.23 0.0 0.452" rpy="-0.026453292 0.012453292 0"/>
+      <origin xyz="0.23 0.0 0.452" rpy="-0.010453292 0.012453292 0.010453292"/>
     </joint>
 
 </robot>

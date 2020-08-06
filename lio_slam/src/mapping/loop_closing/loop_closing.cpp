@@ -107,25 +107,33 @@ bool LoopClosing::Update(const KeyFrame key_frame, const KeyFrame key_gnss) {
 bool LoopClosing::DetectNearestKeyFrame(int& key_frame_index) {
     static int skip_cnt = 0;
     static int skip_num = loop_step_;
+    // 当关键帧的总数量至少要多于 loop_step_ 个,才开始进行闭环检测
     if (++skip_cnt < skip_num)
         return false;
 
-    if ((int)all_key_gnss_.size() < diff_num_ + 1)
+/*     if ((int)all_key_gnss_.size() < diff_num_ + 1)
+        return false; */
+        
+    if ((int)all_key_frames_.size() < diff_num_ + 1)
         return false;
 
-    int key_num = (int)all_key_gnss_.size();
+/*     int key_num = (int)all_key_gnss_.size(); */
+    int key_num = (int)all_key_frames_.size();
     float min_distance = 1000000.0;
     float distance = 0.0;
 
     KeyFrame history_key_frame;
-    KeyFrame current_key_frame = all_key_gnss_.back();
+/*     KeyFrame current_key_frame = all_key_gnss_.back(); */
+    KeyFrame current_key_frame = all_key_frames_.back();// 取得最新的关键帧
 
     key_frame_index = -1;
     for (int i = 0; i < key_num - 1; ++i) {
         if (key_num - i < diff_num_)
             break;
         
-        history_key_frame = all_key_gnss_.at(i);
+        /* history_key_frame = all_key_gnss_.at(i); */
+        history_key_frame = all_key_frames_.at(i);
+
         distance = fabs(current_key_frame.pose(0,3) - history_key_frame.pose(0,3)) + 
                    fabs(current_key_frame.pose(1,3) - history_key_frame.pose(1,3)) + 
                    fabs(current_key_frame.pose(2,3) - history_key_frame.pose(2,3));
